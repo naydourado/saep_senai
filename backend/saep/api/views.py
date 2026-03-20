@@ -3,10 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.models import User
 
 from .models import Usuario, Produto, Movimentacao
 from .serializers import UsuarioSerializer, ProdutoSerializer, MovimentacaoSerializer
-from .filters import *
+from .filters import UsuarioFilter, ProdutoFilter, MovimentacaoFilter
 
 
 class UsuarioViewSet(ModelViewSet):
@@ -34,6 +35,17 @@ class UsuarioViewSet(ModelViewSet):
             "is_active": request.user.is_active,
         })
 
+    def perform_destroy(self, instance):
+        login = instance.login
+
+        try:
+            user = User.objects.get(username=login)
+            user.delete()
+        except User.DoesNotExist:
+            pass
+
+        instance.delete()
+
 
 class ProdutoViewSet(ModelViewSet):
     queryset = Produto.objects.all()
@@ -50,6 +62,7 @@ class ProdutoViewSet(ModelViewSet):
             return qs
 
         return qs
+
 
 class MovimentacaoViewSet(ModelViewSet):
     queryset = Movimentacao.objects.all()
