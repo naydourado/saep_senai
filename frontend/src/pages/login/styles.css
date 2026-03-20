@@ -14,6 +14,10 @@ body,
     font-family: "Poppins", sans-serif;
 }
 
+h1 {
+  margin: 0;
+}
+
 .loginPage {
     width: 100%;
     min-height: 100vh;
@@ -56,29 +60,28 @@ body,
 /* card */
 .loginCard {
     width: 390px;
-    min-height: 440px;
     background: #ffffff;
     border-radius: 14px;
-    padding: 34px 34px 26px 34px;
+    padding: 55px 34px 55px 34px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     position: relative;
     z-index: 2;
     box-shadow: none;
 }
 
 .loginTitle {
-    font-size: 31px;
-    font-weight: 700;
+    font-size: 36px;
+    font-weight: 900;
     color: #2b2b2b;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 }
 
 .loginSubtitle {
     font-size: 18px;
     color: #3b3b3b;
-    margin-bottom: 22px;
+    margin-bottom: 35px;
 }
 
 .loginForm {
@@ -131,6 +134,7 @@ body,
     cursor: pointer;
     margin-top: 4px;
     transition: 0.2s;
+    font-weight: 800;
 }
 
 .loginButton:hover {

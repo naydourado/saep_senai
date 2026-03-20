@@ -1,0 +1,164 @@
+* {
+    box-sizing: border-box;
+}
+
+.cadastroProdutoPage {
+    min-height: 100vh;
+    background: #f4f7fb;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.cadastroHeader {
+    background: #1976d2;
+    color: white;
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cadastroHeader h1 {
+    margin-bottom: 6px;
+    font-size: 30px;
+}
+
+.cadastroHeader p {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.voltarButton {
+    background: white;
+    color: #1976d2;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cadastroMain {
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+}
+
+.formCard,
+.tabelaCard {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+.formCard h2,
+.tabelaCard h2 {
+    margin-bottom: 18px;
+    color: #1976d2;
+}
+
+.produtoForm {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.produtoForm input,
+.produtoForm select,
+.buscaArea input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d5dbe3;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+}
+
+.formButtons {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.salvarButton,
+.limparButton,
+.buscaArea button,
+.editarButton,
+.excluirButton {
+    border: none;
+    border-radius: 10px;
+    padding: 11px 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.salvarButton,
+.buscaArea button,
+.editarButton {
+    background: #1976d2;
+    color: white;
+}
+
+.limparButton {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.excluirButton {
+    background: #dc2626;
+    color: white;
+}
+
+.mensagem {
+    margin-top: 14px;
+    font-size: 14px;
+    color: #1976d2;
+    font-weight: bold;
+}
+
+.tabelaHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.buscaArea {
+    display: flex;
+    gap: 10px;
+    width: 320px;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f1f5f9;
+}
+
+th,
+td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    font-size: 14px;
+}
+
+.acoes {
+    display: flex;
+    gap: 8px;
+}
+
+.semDados {
+    text-align: center;
+    color: #6b7280;
+    padding: 24px;
+}
