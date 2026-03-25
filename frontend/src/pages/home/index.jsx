@@ -75,7 +75,7 @@ export default function Home() {
             {/* Cabeçalho da página */}
             <header className="homeHeader">
                 <div>
-                    <h1 className="homeTitle">Sistema de Gestão</h1>
+                    <h1 className="homeTitle">Sistema de Gerenciamento de Estoque</h1>
                 </div>
 
                 <div className="userArea">
