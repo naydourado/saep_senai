@@ -53,8 +53,8 @@ export default function Login() {
 
                 {/* Card branco central */}
                 <div className="loginCard">
-                    <h1 className="loginTitle">ACESSAR SISTEMA</h1>
-                    <p className="loginSubtitle">Entre com suas credenciais</p>
+                    <h1 className="loginTitle">Sistema de Estoque</h1>
+                    <p className="loginSubtitle">Entre com suas credenciais para acessar o sistema</p>
 
                     <form className="loginForm" onSubmit={logar}>
 
@@ -86,7 +86,7 @@ export default function Login() {
 
                         {/* Botão login */}
                         <button className="loginButton" type="submit" disabled={loading}>
-                            {loading ? "Entrando..." : "LOGIN"}
+                            {loading ? "Entrando..." : "Entrar"}
                         </button>
                     </form>
                 </div>

@@ -1,268 +1,362 @@
-// src/pages/gestaoEstoque/index.jsx
+// Importações principais do React
 import React, { useEffect, useState } from "react";
+
+// Biblioteca para requisições HTTP
 import axios from "axios";
+
+// Estilos da página
 import "./styles.css";
 
 export default function GestaoEstoque() {
-    const [produtos, setProdutos] = useState([]);
-    const [produtoSelecionado, setProdutoSelecionado] = useState("");
-    const [tipoMovimentacao, setTipoMovimentacao] = useState("");
-    const [dataMovimentacao, setDataMovimentacao] = useState("");
-    const [quantidade, setQuantidade] = useState("");
-    const [mensagem, setMensagem] = useState("");
-    const [alerta, setAlerta] = useState("");
+  // Lista de produtos vindos da API
+  const [produtos, setProdutos] = useState([]);
 
-    useEffect(() => {
-        carregarProdutos();
-    }, []);
+  // Campos do formulário
+  const [produtoSelecionado, setProdutoSelecionado] = useState("");
+  const [tipoMovimentacao, setTipoMovimentacao] = useState("");
+  const [dataMovimentacao, setDataMovimentacao] = useState("");
+  const [quantidade, setQuantidade] = useState("");
 
-    const getAuthHeaders = () => {
-        const token = localStorage.getItem("token");
+  // Mensagens de retorno
+  const [mensagem, setMensagem] = useState("");
+  const [alerta, setAlerta] = useState("");
 
-        return {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
+  useEffect(() => {
+    carregarProdutos();
+  }, []);
+
+  // Recupera o token salvo
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     };
+  };
 
-    const carregarProdutos = async () => {
-        try {
-            // Busca todos os produtos cadastrados
-            const response = await axios.get(
-                "http://127.0.0.1:8000/api/produtos/",
-                getAuthHeaders()
-            );
+  // Busca os produtos do sistema
+  const carregarProdutos = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/produtos/",
+        getAuthHeaders()
+      );
 
-            // Ordena os produtos em ordem alfabética pelo nome
-            const produtosOrdenados = [...response.data].sort((a, b) =>
-                a.nome.localeCompare(b.nome)
-            );
+      // Ordenação alfabética
+      const produtosOrdenados = [...response.data].sort((a, b) =>
+        a.nome.localeCompare(b.nome)
+      );
 
-            setProdutos(produtosOrdenados);
-        } catch (error) {
-            console.log("Erro ao carregar produtos: ", error);
-            setMensagem("Erro ao carregar os produtos.");
+      setProdutos(produtosOrdenados);
+    } catch (error) {
+      console.log("Erro ao carregar produtos: ", error);
+      setMensagem("Erro ao carregar os produtos.");
+    }
+  };
+
+  // Limpa os campos do formulário
+  const limparFormulario = () => {
+    setProdutoSelecionado("");
+    setTipoMovimentacao("");
+    setDataMovimentacao("");
+    setQuantidade("");
+    setAlerta("");
+  };
+
+  // Registra a movimentação
+  const registrarMovimentacao = async (e) => {
+    e.preventDefault();
+    setMensagem("");
+    setAlerta("");
+
+    if (
+      !produtoSelecionado ||
+      !tipoMovimentacao ||
+      !dataMovimentacao ||
+      !quantidade
+    ) {
+      setMensagem("Preencha todos os campos.");
+      return;
+    }
+
+    if (isNaN(quantidade) || Number(quantidade) <= 0) {
+      setMensagem("Informe uma quantidade válida.");
+      return;
+    }
+
+    try {
+      const produto = produtos.find(
+        (item) => String(item.idProduto) === String(produtoSelecionado)
+      );
+
+      if (!produto) {
+        setMensagem("Produto não encontrado.");
+        return;
+      }
+
+      let novaQuantidade = Number(produto.quantidadeAtual);
+
+      if (tipoMovimentacao === "entrada") {
+        novaQuantidade += Number(quantidade);
+      } else if (tipoMovimentacao === "saida") {
+        if (Number(quantidade) > Number(produto.quantidadeAtual)) {
+          setMensagem("Quantidade de saída maior que o estoque disponível.");
+          return;
         }
-    };
 
-    const limparFormulario = () => {
-        setProdutoSelecionado("");
-        setTipoMovimentacao("");
-        setDataMovimentacao("");
-        setQuantidade("");
-        setAlerta("");
-    };
+        novaQuantidade -= Number(quantidade);
+      }
 
-    const registrarMovimentacao = async (e) => {
-        e.preventDefault();
-        setMensagem("");
-        setAlerta("");
+      // Atualiza estoque do produto
+      await axios.put(
+        `http://127.0.0.1:8000/api/produtos/${produto.idProduto}/`,
+        {
+          nome: produto.nome,
+          tipo: produto.tipo,
+          descricao: produto.descricao,
+          quantidadeMinima: produto.quantidadeMinima,
+          quantidadeAtual: novaQuantidade,
+        },
+        getAuthHeaders()
+      );
 
-        // Validações dos campos
-        if (!produtoSelecionado || !tipoMovimentacao || !dataMovimentacao || !quantidade) {
-            setMensagem("Preencha todos os campos.");
-            return;
-        }
+      // Registra movimentação
+      const idUsuario = localStorage.getItem("idUsuario");
 
-        if (isNaN(quantidade) || Number(quantidade) <= 0) {
-            setMensagem("Informe uma quantidade válida.");
-            return;
-        }
+      if (idUsuario) {
+        await axios.post(
+          "http://127.0.0.1:8000/api/movimentacoes/",
+          {
+            data_movimentacao: dataMovimentacao,
+            produto: Number(produto.idProduto),
+            quantidade: Number(quantidade),
+            usuario: Number(idUsuario),
+          },
+          getAuthHeaders()
+        );
+      }
 
-        try {
-            // Busca o produto selecionado completo
-            const produto = produtos.find(
-                (item) => String(item.idProduto) === String(produtoSelecionado)
-            );
+      // Alerta se ficar abaixo do mínimo
+      if (
+        tipoMovimentacao === "saida" &&
+        novaQuantidade < Number(produto.quantidadeMinima)
+      ) {
+        setAlerta(
+          `Atenção: o produto "${produto.nome}" ficou abaixo do estoque mínimo.`
+        );
+      }
 
-            if (!produto) {
-                setMensagem("Produto não encontrado.");
-                return;
-            }
+      setMensagem("Movimentação registrada com sucesso.");
+      limparFormulario();
+      carregarProdutos();
+    } catch (error) {
+      console.log("Erro ao registrar movimentação: ", error);
+      setMensagem("Erro ao registrar movimentação.");
+    }
+  };
 
-            let novaQuantidade = Number(produto.quantidadeAtual);
+  // Voltar para home
+  const voltarHome = () => {
+    window.location.href = "/home";
+  };
 
-            // Verifica se a movimentação é entrada ou saída
-            if (tipoMovimentacao === "entrada") {
-                novaQuantidade += Number(quantidade);
-            } else if (tipoMovimentacao === "saida") {
-                // Verifica se há estoque suficiente para saída
-                if (Number(quantidade) > Number(produto.quantidadeAtual)) {
-                    setMensagem("Quantidade de saída maior que o estoque disponível.");
-                    return;
-                }
+  // Produtos abaixo do mínimo
+  const produtosAbaixoDoMinimo = produtos.filter(
+    (produto) => Number(produto.quantidadeAtual) < Number(produto.quantidadeMinima)
+  );
 
-                novaQuantidade -= Number(quantidade);
-            }
-
-            // Atualiza o estoque do produto
-            await axios.put(
-                `http://127.0.0.1:8000/api/produtos/${produto.idProduto}/`,
-                {
-                    nome: produto.nome,
-                    tipo: produto.tipo,
-                    descricao: produto.descricao,
-                    quantidadeMinima: produto.quantidadeMinima,
-                    quantidadeAtual: novaQuantidade,
-                },
-                getAuthHeaders()
-            );
-
-            // Pega o id do usuário logado salvo no localStorage, se existir
-            const idUsuario = localStorage.getItem("idUsuario");
-
-            // Registra a movimentação no banco
-            if (idUsuario) {
-                await axios.post(
-                    "http://127.0.0.1:8000/api/movimentacoes/",
-                    {
-                        data_movimentacao: dataMovimentacao,
-                        produto: Number(produto.idProduto),
-                        quantidade: Number(quantidade),
-                        usuario: Number(idUsuario),
-                    },
-                    getAuthHeaders()
-                );
-            }
-
-            // Exibe alerta se a saída deixar abaixo do mínimo
-            if (
-                tipoMovimentacao === "saida" &&
-                novaQuantidade < Number(produto.quantidadeMinima)
-            ) {
-                setAlerta(
-                    `Atenção: o produto "${produto.nome}" ficou abaixo do estoque mínimo.`
-                );
-            }
-
-            setMensagem("Movimentação registrada com sucesso.");
-            limparFormulario();
-            carregarProdutos();
-        } catch (error) {
-            console.log("Erro ao registrar movimentação: ", error);
-            setMensagem("Erro ao registrar movimentação.");
-        }
-    };
-
-    const voltarHome = () => {
-        // Volta para a interface principal
-        window.location.href = "/home";
-    };
-
-    return (
-        <div className="gestaoPage">
-
-            {/* Cabeçalho */}
-            <header className="gestaoHeader">
-                <div>
-                    <h1>Gestão de Estoque</h1>
-                    <p>Controle as entradas e saídas dos produtos</p>
-                </div>
-
-                <button className="voltarButton" onClick={voltarHome}>
-                    Voltar
-                </button>
-            </header>
-
-            <main className="gestaoMain">
-
-                {/* Formulário de movimentação */}
-                <section className="movimentacaoCard">
-                    <h2>Nova Movimentação</h2>
-
-                    <form className="movimentacaoForm" onSubmit={registrarMovimentacao}>
-
-                        {/* Seleção do produto */}
-                        <select
-                            value={produtoSelecionado}
-                            onChange={(e) => setProdutoSelecionado(e.target.value)}
-                        >
-                            <option value="">Selecione um produto</option>
-
-                            {produtos.map((produto) => (
-                                <option key={produto.idProduto} value={produto.idProduto}>
-                                    {produto.nome}
-                                </option>
-                            ))}
-                        </select>
-
-                        {/* Tipo da movimentação */}
-                        <select
-                            value={tipoMovimentacao}
-                            onChange={(e) => setTipoMovimentacao(e.target.value)}
-                        >
-                            <option value="">Selecione o tipo de movimentação</option>
-                            <option value="entrada">Entrada</option>
-                            <option value="saida">Saída</option>
-                        </select>
-
-                        {/* Data da movimentação */}
-                        <input
-                            type="datetime-local"
-                            value={dataMovimentacao}
-                            onChange={(e) => setDataMovimentacao(e.target.value)}
-                        />
-
-                        {/* Quantidade movimentada */}
-                        <input
-                            type="number"
-                            placeholder="Quantidade"
-                            value={quantidade}
-                            onChange={(e) => setQuantidade(e.target.value)}
-                        />
-
-                        <button type="submit" className="registrarButton">
-                            Registrar Movimentação
-                        </button>
-                    </form>
-
-                    {/* Mensagens */}
-                    {mensagem && <p className="mensagem">{mensagem}</p>}
-                    {alerta && <p className="alerta">{alerta}</p>}
-                </section>
-
-                {/* Lista de produtos */}
-                <section className="produtosCard">
-                    <h2>Produtos em Estoque</h2>
-
-                    <div className="tableWrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Tipo</th>
-                                    <th>Descrição</th>
-                                    <th>Qtd. Mínima</th>
-                                    <th>Qtd. Atual</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {produtos.length > 0 ? (
-                                    produtos.map((produto) => (
-                                        <tr key={produto.idProduto}>
-                                            <td>{produto.idProduto}</td>
-                                            <td>{produto.nome}</td>
-                                            <td>{produto.tipo}</td>
-                                            <td>{produto.descricao}</td>
-                                            <td>{produto.quantidadeMinima}</td>
-                                            <td>{produto.quantidadeAtual}</td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="6" className="semDados">
-                                            Nenhum produto encontrado.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </main>
+  return (
+    <div className="gestaoPage">
+      {/* ================= TOPO ================= */}
+      <header className="topBar">
+        <div className="topLeft">
+          <button className="backButton" onClick={voltarHome}>
+            ← Voltar
+          </button>
+            <hr />
+          <h1 className="pageTitle">Gestão de Estoque</h1>
         </div>
-    );
+
+          <button className="logoutButton">Sair</button>
+
+      </header>
+
+      {/* ================= CONTEÚDO ================= */}
+      <main className="gestaoContent">
+        {/* Coluna esquerda */}
+        <section className="leftColumn">
+          <div className="movimentacaoCard">
+            <div className="cardHeader Header">
+              <h2>↗ Nova Movimentação</h2>
+            </div>
+
+            <form className="movimentacaoForm" onSubmit={registrarMovimentacao}>
+              {/* Produto */}
+              <div className="formGroup">
+                <label>Produto *</label>
+                <select
+                  value={produtoSelecionado}
+                  onChange={(e) => setProdutoSelecionado(e.target.value)}
+                >
+                  <option value="">Selecione um produto</option>
+
+                  {produtos.map((produto) => (
+                    <option key={produto.idProduto} value={produto.idProduto}>
+                      {produto.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Tipo de movimentação */}
+              <div className="formGroup">
+                <label>Tipo de Movimentação *</label>
+
+                <div className="radioGroup">
+                  <label className="radioItem">
+                    <input
+                      type="radio"
+                      name="tipoMovimentacao"
+                      value="entrada"
+                      checked={tipoMovimentacao === "entrada"}
+                      onChange={(e) => setTipoMovimentacao(e.target.value)}
+                    />
+                    <span className="entradaText">↗ Entrada</span>
+                  </label>
+
+                  <label className="radioItem">
+                    <input
+                      type="radio"
+                      name="tipoMovimentacao"
+                      value="saida"
+                      checked={tipoMovimentacao === "saida"}
+                      onChange={(e) => setTipoMovimentacao(e.target.value)}
+                    />
+                    <span className="saidaText">↘ Saída</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Quantidade */}
+              <div className="formGroup">
+                <label>Quantidade *</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={quantidade}
+                  onChange={(e) => setQuantidade(e.target.value)}
+                />
+              </div>
+
+              {/* Data */}
+              <div className="formGroup">
+                <label>Data da Movimentação *</label>
+                <input
+                  type="date"
+                  value={dataMovimentacao}
+                  onChange={(e) => setDataMovimentacao(e.target.value)}
+                />
+              </div>
+
+              <button type="submit" className="registrarButton">
+                Registrar Movimentação
+              </button>
+            </form>
+
+            {/* Mensagens */}
+            {mensagem && <p className="mensagemBox">{mensagem}</p>}
+            {alerta && <p className="alertaBox">{alerta}</p>}
+          </div>
+        </section>
+
+        {/* Coluna direita */}
+        <section className="rightColumn">
+          {/* Alerta superior */}
+          {produtosAbaixoDoMinimo.length > 0 && (
+            <div className="warningCard">
+                <h3>⚠ Atenção!</h3>
+
+                <p>
+                {produtosAbaixoDoMinimo.length} produto(s) com estoque abaixo do mínimo:
+                </p>
+
+                <ul className="warningList">
+                {produtosAbaixoDoMinimo.map((produto) => (
+                    <li key={produto.idProduto}>{produto.nome}</li>
+                ))}
+                </ul>
+            </div>
+            )}
+
+          {/* Card da tabela */}
+          <div className="produtosCard">
+            <div className="produtosHeader">
+              <h2>📦 Produtos (Ordenação Alfabética)</h2>
+            </div>
+
+            <div className="tableWrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Estoque Atual</th>
+                    <th>Estoque Mínimo</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {produtos.length > 0 ? (
+                    produtos.map((produto) => {
+                      const abaixoDoMinimo =
+                        Number(produto.quantidadeAtual) <
+                        Number(produto.quantidadeMinima);
+
+                      return (
+                        <tr
+                          key={produto.idProduto}
+                          className={abaixoDoMinimo ? "linhaAlerta" : ""}
+                        >
+                          <td>
+                            <div className="produtoNome">{produto.nome}</div>
+                            <div className="produtoDescricao">
+                              {produto.descricao}
+                            </div>
+                          </td>
+
+                          <td className={abaixoDoMinimo ? "valorBaixo" : ""}>
+                            {produto.quantidadeAtual}
+                          </td>
+
+                          <td>{produto.quantidadeMinima}</td>
+
+                          <td>
+                            {abaixoDoMinimo ? (
+                              <span className="statusBadge statusBaixo">
+                                △ Baixo
+                              </span>
+                            ) : (
+                              <span className="statusBadge statusOk">OK</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="semDados">
+                        Nenhum produto encontrado.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
 }

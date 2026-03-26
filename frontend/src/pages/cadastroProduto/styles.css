@@ -1,164 +1,262 @@
 * {
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.cadastroProdutoPage {
-    min-height: 100vh;
-    background: #f4f7fb;
-    font-family: Arial, Helvetica, sans-serif;
+body {
+  background-color: #f5f7fb;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #0f172a;
 }
 
-.cadastroHeader {
-    background: #1976d2;
-    color: white;
-    padding: 24px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+button,
+input {
+  font-family: inherit;
 }
 
-.cadastroHeader h1 {
-    margin-bottom: 6px;
-    font-size: 30px;
+/* ================= PÁGINA ================= */
+
+.cadastroPage {
+  min-height: 100vh;
+  background-color: #f5f7fb;
 }
 
-.cadastroHeader p {
-    font-size: 15px;
-    opacity: 0.9;
+/* ================= TOPO ================= */
+
+.topBar {
+  height: 72px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.voltarButton {
-    background: white;
-    color: #1976d2;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
+.topLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.cadastroMain {
-    padding: 30px;
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: 24px;
+.backButton {
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
 }
 
-.formCard,
-.tabelaCard {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+.titleDivider {
+  width: 1px;
+  height: 32px;
+  background-color: #d1d5db;
 }
 
-.formCard h2,
-.tabelaCard h2 {
-    margin-bottom: 18px;
-    color: #1976d2;
+.pageTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-.produtoForm {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.produtoForm input,
-.produtoForm select,
-.buscaArea input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #d5dbe3;
-    border-radius: 10px;
-    outline: none;
-    font-size: 14px;
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f1f5f9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #1e293b;
+  font-size: 15px;
 }
 
-.formButtons {
-    display: flex;
-    gap: 10px;
-    margin-top: 6px;
+.userIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #dbeafe;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
 }
 
-.salvarButton,
-.limparButton,
-.buscaArea button,
-.editarButton,
-.excluirButton {
-    border: none;
-    border-radius: 10px;
-    padding: 11px 16px;
-    font-weight: bold;
-    cursor: pointer;
+.logoutButton {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.salvarButton,
-.buscaArea button,
-.editarButton {
-    background: #1976d2;
-    color: white;
+/* ================= CONTEÚDO ================= */
+
+.cadastroContent {
+  padding: 32px 62px;
 }
 
-.limparButton {
-    background: #e5e7eb;
-    color: #111827;
+.produtosCard {
+  background-color: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
 }
 
-.excluirButton {
-    background: #dc2626;
-    color: white;
+/* Cabeçalho azul claro do card */
+.produtosCardHeader {
+  background-color: #dfeaf9;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.mensagem {
-    margin-top: 14px;
-    font-size: 14px;
-    color: #1976d2;
-    font-weight: bold;
+.produtosCardHeader h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
 }
 
-.tabelaHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
+.novoProdutoButton {
+  background-color: #4f7cff;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.buscaArea {
-    display: flex;
-    gap: 10px;
-    width: 320px;
+.novoProdutoButton:hover {
+  background-color: #3f6df0;
 }
+
+/* ================= BUSCA ================= */
+
+.searchArea {
+  background-color: #dfeaf9;
+  padding: 0 24px 24px;
+  display: flex;
+  gap: 12px;
+}
+
+.searchArea input {
+  flex: 1;
+  height: 44px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 15px;
+  outline: none;
+}
+
+.buscarButton {
+  height: 44px;
+  padding: 0 18px;
+  background-color: #020617;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.buscarButton:hover {
+  background-color: #111827;
+}
+
+.mensagemBox {
+  margin: 18px 24px 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  font-size: 14px;
+}
+
+/* ================= TABELA ================= */
 
 .tableWrapper {
-    overflow-x: auto;
+  padding: 26px 24px 24px;
+  overflow-x: auto;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 thead {
-    background: #f1f5f9;
+  background-color: #ffffff;
 }
 
-th,
+th {
+  text-align: left;
+  padding: 14px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+}
+
 td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #e5e7eb;
-    text-align: left;
-    font-size: 14px;
+  padding: 14px 8px;
+  font-size: 15px;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
 }
 
-.acoes {
-    display: flex;
-    gap: 8px;
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.estoqueBaixo {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.acoesCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.editButton {
+  color: #111827;
+}
+
+.deleteButton {
+  color: #ef4444;
 }
 
 .semDados {
-    text-align: center;
-    color: #6b7280;
-    padding: 24px;
+  text-align: center;
+  color: #6b7280;
+  padding: 18px;
 }

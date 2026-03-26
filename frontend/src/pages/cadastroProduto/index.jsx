@@ -1,337 +1,204 @@
-// src/pages/cadastroProduto/index.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./styles.css";
 
 export default function CadastroProduto() {
-    const [produtos, setProdutos] = useState([]);
-    const [busca, setBusca] = useState("");
+  const [produtos, setProdutos] = useState([]);
+  const [produtosFiltrados, setProdutosFiltrados] = useState([]);
+  const [busca, setBusca] = useState("");
+  const [mensagem, setMensagem] = useState("");
 
-    const [nome, setNome] = useState("");
-    const [tipo, setTipo] = useState("");
-    const [descricao, setDescricao] = useState("");
-    const [quantidadeMinima, setQuantidadeMinima] = useState("");
-    const [quantidadeAtual, setQuantidadeAtual] = useState("");
+  useEffect(() => {
+    carregarProdutos();
+  }, []);
 
-    const [editandoId, setEditandoId] = useState(null);
-    const [mensagem, setMensagem] = useState("");
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
 
-    useEffect(() => {
-        carregarProdutos();
-    }, []);
-
-    const getAuthHeaders = () => {
-        const token = localStorage.getItem("token");
-
-        return {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     };
+  };
 
-    const carregarProdutos = async () => {
-        try {
-            // Busca os produtos na API
-            const response = await axios.get(
-                "http://127.0.0.1:8000/api/produtos/",
-                getAuthHeaders()
-            );
+  const carregarProdutos = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/produtos/",
+        getAuthHeaders()
+      );
 
-            setProdutos(response.data);
-        } catch (error) {
-            console.log("Erro ao carregar produtos: ", error);
-            setMensagem("Erro ao carregar produtos.");
-        }
-    };
+      setProdutos(response.data);
+      setProdutosFiltrados(response.data);
+    } catch (error) {
+      console.log("Erro ao carregar produtos:", error);
+      setMensagem("Erro ao carregar produtos.");
+    }
+  };
 
-    const buscarProdutos = async (e) => {
-        e.preventDefault();
+  const buscarProdutos = () => {
+    const termo = busca.toLowerCase().trim();
 
-        try {
-            // Se a busca estiver vazia, volta a listar tudo
-            if (!busca.trim()) {
-                carregarProdutos();
-                return;
-            }
+    const filtrados = produtos.filter((produto) => {
+      const nome = produto.nome ? produto.nome.toLowerCase() : "";
+      const descricao = produto.descricao
+        ? produto.descricao.toLowerCase()
+        : "";
 
-            // Faz a busca pelo nome do produto
-            const response = await axios.get(
-                `http://127.0.0.1:8000/api/produtos/?nome=${busca}`,
-                getAuthHeaders()
-            );
+      return nome.includes(termo) || descricao.includes(termo);
+    });
 
-            setProdutos(response.data);
-        } catch (error) {
-            console.log("Erro ao buscar produtos: ", error);
-            setMensagem("Erro ao buscar produtos.");
-        }
-    };
+    setProdutosFiltrados(filtrados);
+  };
 
-    const limparFormulario = () => {
-        setNome("");
-        setTipo("");
-        setDescricao("");
-        setQuantidadeMinima("");
-        setQuantidadeAtual("");
-        setEditandoId(null);
-    };
+  useEffect(() => {
+    if (busca.trim() === "") {
+      setProdutosFiltrados(produtos);
+    }
+  }, [busca, produtos]);
 
-    const validarFormulario = () => {
-        // Valida se todos os campos foram preenchidos
-        if (!nome || !tipo || !descricao || quantidadeMinima === "" || quantidadeAtual === "") {
-            setMensagem("Preencha todos os campos.");
-            return false;
-        }
+  const voltarHome = () => {
+    window.location.href = "/home";
+  };
 
-        // Valida se as quantidades são numéricas
-        if (isNaN(quantidadeMinima) || isNaN(quantidadeAtual)) {
-            setMensagem("Quantidade mínima e quantidade atual devem ser números.");
-            return false;
-        }
+  const irParaNovoProduto = () => {
+    window.location.href = "/novo-produto";
+  };
 
-        // Valida se as quantidades não são negativas
-        if (Number(quantidadeMinima) < 0 || Number(quantidadeAtual) < 0) {
-            setMensagem("As quantidades não podem ser negativas.");
-            return false;
-        }
+  const editarProduto = (idProduto) => {
+    window.location.href = `/editar-produto/${idProduto}`;
+  };
 
-        return true;
-    };
+  const excluirProduto = async (idProduto) => {
+    const confirmar = window.confirm("Deseja excluir este produto?");
 
-    const salvarProduto = async (e) => {
-        e.preventDefault();
-        setMensagem("");
+    if (!confirmar) return;
 
-        // Faz as validações antes de salvar
-        if (!validarFormulario()) {
-            return;
-        }
+    try {
+      await axios.delete(
+        `http://127.0.0.1:8000/api/produtos/${idProduto}/`,
+        getAuthHeaders()
+      );
 
-        const dadosProduto = {
-            nome,
-            tipo,
-            descricao,
-            quantidadeMinima: Number(quantidadeMinima),
-            quantidadeAtual: Number(quantidadeAtual),
-        };
+      setMensagem("Produto excluído com sucesso.");
+      carregarProdutos();
+    } catch (error) {
+      console.log("Erro ao excluir produto:", error);
+      setMensagem("Erro ao excluir produto.");
+    }
+  };
 
-        try {
-            // Se estiver editando, faz PUT
-            if (editandoId) {
-                await axios.put(
-                    `http://127.0.0.1:8000/api/produtos/${editandoId}/`,
-                    dadosProduto,
-                    getAuthHeaders()
-                );
+  return (
+    <div className="cadastroPage">
+      <header className="topBar">
+        <div className="topLeft">
+          <button className="backButton" onClick={voltarHome}>
+            ← Voltar
+          </button>
 
-                setMensagem("Produto atualizado com sucesso.");
-            } else {
-                // Se não estiver editando, faz POST
-                await axios.post(
-                    "http://127.0.0.1:8000/api/produtos/",
-                    dadosProduto,
-                    getAuthHeaders()
-                );
+          <div className="titleDivider"></div>
 
-                setMensagem("Produto cadastrado com sucesso.");
-            }
+          <h1 className="pageTitle">Cadastro de Produtos</h1>
+        </div>
 
-            limparFormulario();
-            carregarProdutos();
-        } catch (error) {
-            console.log("Erro ao salvar produto: ", error);
-            setMensagem("Erro ao salvar produto.");
-        }
-    };
+        <div className="topRight">
+          <div className="userBadge">
+            <span className="userIcon">◉</span>
+            <span>Administrador</span>
+          </div>
 
-    const editarProduto = (produto) => {
-        // Preenche o formulário com os dados do produto selecionado
-        setNome(produto.nome);
-        setTipo(produto.tipo);
-        setDescricao(produto.descricao);
-        setQuantidadeMinima(produto.quantidadeMinima);
-        setQuantidadeAtual(produto.quantidadeAtual);
-        setEditandoId(produto.idProduto);
-        setMensagem("");
-    };
+          <button className="logoutButton">Sair</button>
+        </div>
+      </header>
 
-    const excluirProduto = async (id) => {
-        const confirmar = window.confirm("Deseja realmente excluir este produto?");
+      <main className="cadastroContent">
+        <section className="produtosCard">
+          <div className="produtosCardHeader">
+            <h2>Lista de Produtos</h2>
 
-        if (!confirmar) {
-            return;
-        }
+            <button className="novoProdutoButton" onClick={irParaNovoProduto}>
+              + Novo Produto
+            </button>
+          </div>
 
-        try {
-            // Exclui o produto da API
-            await axios.delete(
-                `http://127.0.0.1:8000/api/produtos/${id}/`,
-                getAuthHeaders()
-            );
+          <div className="searchArea">
+            <input
+              type="text"
+              placeholder="Buscar produtos por nome ou descrição..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
 
-            setMensagem("Produto excluído com sucesso.");
-            carregarProdutos();
+            <button className="buscarButton" onClick={buscarProdutos}>
+              Buscar
+            </button>
+          </div>
 
-            // Se estiver editando o mesmo produto, limpa o formulário
-            if (editandoId === id) {
-                limparFormulario();
-            }
-        } catch (error) {
-            console.log("Erro ao excluir produto: ", error);
-            setMensagem("Erro ao excluir produto.");
-        }
-    };
+          {mensagem && <p className="mensagemBox">{mensagem}</p>}
 
-    const voltarHome = () => {
-        // Volta para a interface principal
-        window.location.href = "/home";
-    };
+          <div className="tableWrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Descrição</th>
+                  <th>Preço</th>
+                  <th>Estoque Atual</th>
+                  <th>Estoque Mínimo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
 
-    return (
-        <div className="cadastroProdutoPage">
+              <tbody>
+                {produtosFiltrados.length > 0 ? (
+                  produtosFiltrados.map((produto) => {
+                    const abaixoDoMinimo =
+                      Number(produto.quantidadeAtual) <
+                      Number(produto.quantidadeMinima);
 
-            {/* Cabeçalho */}
-            <header className="cadastroHeader">
-                <div>
-                    <h1>Cadastro de Produto</h1>
-                    <p>Gerencie os produtos cadastrados no sistema</p>
-                </div>
-
-                <button className="voltarButton" onClick={voltarHome}>
-                    Voltar
-                </button>
-            </header>
-
-            <main className="cadastroMain">
-
-                {/* Formulário */}
-                <section className="formCard">
-                    <h2>{editandoId ? "Editar Produto" : "Novo Produto"}</h2>
-
-                    <form className="produtoForm" onSubmit={salvarProduto}>
-                        <input
-                            type="text"
-                            placeholder="Nome do produto"
-                            value={nome}
-                            onChange={(e) => setNome(e.target.value)}
-                        />
-
-                        <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
-                            <option value="">Selecione o tipo</option>
-                            <option value="smartphones">Smartphones</option>
-                            <option value="notebooks">Notebooks</option>
-                            <option value="smart TVs">Smart TVs</option>
-                        </select>
-
-                        <input
-                            type="text"
-                            placeholder="Descrição"
-                            value={descricao}
-                            onChange={(e) => setDescricao(e.target.value)}
-                        />
-
-                        <input
-                            type="number"
-                            placeholder="Quantidade mínima"
-                            value={quantidadeMinima}
-                            onChange={(e) => setQuantidadeMinima(e.target.value)}
-                        />
-
-                        <input
-                            type="number"
-                            placeholder="Quantidade atual"
-                            value={quantidadeAtual}
-                            onChange={(e) => setQuantidadeAtual(e.target.value)}
-                        />
-
-                        <div className="formButtons">
-                            <button type="submit" className="salvarButton">
-                                {editandoId ? "Atualizar" : "Cadastrar"}
+                    return (
+                      <tr key={produto.idProduto}>
+                        <td>{produto.nome}</td>
+                        <td>{produto.descricao}</td>
+                        <td className={abaixoDoMinimo ? "estoqueBaixo" : ""}>
+                          {produto.quantidadeAtual}
+                        </td>
+                        <td>{produto.quantidadeMinima}</td>
+                        <td>
+                          <div className="acoesCell">
+                            <button
+                              className="iconButton editButton"
+                              onClick={() => editarProduto(produto.idProduto)}
+                              title="Editar"
+                            >
+                              ✎
                             </button>
 
                             <button
-                                type="button"
-                                className="limparButton"
-                                onClick={limparFormulario}
+                              className="iconButton deleteButton"
+                              onClick={() => excluirProduto(produto.idProduto)}
+                              title="Excluir"
                             >
-                                Limpar
+                              🗑
                             </button>
-                        </div>
-                    </form>
-
-                    {mensagem && <p className="mensagem">{mensagem}</p>}
-                </section>
-
-                {/* Busca e tabela */}
-                <section className="tabelaCard">
-                    <div className="tabelaHeader">
-                        <h2>Produtos Cadastrados</h2>
-
-                        <form className="buscaArea" onSubmit={buscarProdutos}>
-                            <input
-                                type="text"
-                                placeholder="Buscar por nome"
-                                value={busca}
-                                onChange={(e) => setBusca(e.target.value)}
-                            />
-                            <button type="submit">Buscar</button>
-                        </form>
-                    </div>
-
-                    <div className="tableWrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Tipo</th>
-                                    <th>Descrição</th>
-                                    <th>Qtd. Mínima</th>
-                                    <th>Qtd. Atual</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {produtos.length > 0 ? (
-                                    produtos.map((produto) => (
-                                        <tr key={produto.idProduto}>
-                                            <td>{produto.idProduto}</td>
-                                            <td>{produto.nome}</td>
-                                            <td>{produto.tipo}</td>
-                                            <td>{produto.descricao}</td>
-                                            <td>{produto.quantidadeMinima}</td>
-                                            <td>{produto.quantidadeAtual}</td>
-                                            <td className="acoes">
-                                                <button
-                                                    className="editarButton"
-                                                    onClick={() => editarProduto(produto)}
-                                                >
-                                                    Editar
-                                                </button>
-
-                                                <button
-                                                    className="excluirButton"
-                                                    onClick={() => excluirProduto(produto.idProduto)}
-                                                >
-                                                    Excluir
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="7" className="semDados">
-                                            Nenhum produto encontrado.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </main>
-        </div>
-    );
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="semDados">
+                      Nenhum produto encontrado.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
 }

@@ -1,126 +1,357 @@
 * {
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f5f7fb;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #0f172a;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
 }
 
 .gestaoPage {
-    min-height: 100vh;
-    background: #f4f7fb;
-    font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-color: #f5f7fb;
 }
 
-.gestaoHeader {
-    background: #1976d2;
-    color: white;
-    padding: 24px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* ================= TOPO ================= */
+
+.topBar {
+  height: 70px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.gestaoHeader h1 {
-    margin-bottom: 6px;
-    font-size: 30px;
+.topLeft {
+  display: flex;
+  align-items: center;
+  gap: 26px;
 }
 
-.gestaoHeader p {
-    font-size: 15px;
-    opacity: 0.9;
+.backButton {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
 }
 
-.voltarButton {
-    background: white;
-    color: #1976d2;
+hr {
+    width: 2px;
+    height: 40px;
     border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
+    background-color: #000000;
 }
 
-.gestaoMain {
-    padding: 30px;
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: 24px;
+.pageTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-.movimentacaoCard,
-.produtosCard {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f1f5f9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #1e293b;
+  font-size: 15px;
 }
 
-.movimentacaoCard h2,
-.produtosCard h2 {
-    margin-bottom: 18px;
-    color: #1976d2;
+.userIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #dbeafe;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+}
+
+.logoutButton {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ================= CONTEÚDO ================= */
+
+.gestaoContent {
+  display: grid;
+  grid-template-columns: 390px 1fr;
+  gap: 24px;
+  padding: 30px 58px;
+  align-items: start;
+}
+
+/* ================= CARD ESQUERDO ================= */
+
+.movimentacaoCard {
+  background-color: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+.cardHeader {
+  padding: 22px 24px;
+  border-bottom: 1px solid #d8dee8;
+}
+
+.Header {
+  background-color: #000000;
+}
+
+.cardHeader h2 {
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .movimentacaoForm {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  padding: 22px 24px 24px;
 }
 
-.movimentacaoForm input,
-.movimentacaoForm select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #d5dbe3;
-    border-radius: 10px;
-    outline: none;
-    font-size: 14px;
+.formGroup {
+  margin-bottom: 18px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  height: 42px;
+  border: 1px solid #e5e7eb;
+  background-color: #f3f4f6;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 15px;
+  color: #374151;
+  outline: none;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.radioItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.radioItem input {
+  width: auto;
+  height: auto;
+}
+
+.entradaText {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.saidaText {
+  color: #dc2626;
+  font-weight: 600;
 }
 
 .registrarButton {
-    border: none;
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-weight: bold;
-    cursor: pointer;
-    background: #1976d2;
-    color: white;
+  width: 100%;
+  height: 44px;
+  background-color: #020617;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
 }
 
-.mensagem {
-    margin-top: 14px;
-    font-size: 14px;
-    color: #1976d2;
-    font-weight: bold;
+.mensagemBox,
+.alertaBox {
+  margin: 0 24px 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
 }
 
-.alerta {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #dc2626;
-    font-weight: bold;
+.mensagemBox {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.alertaBox {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* ================= COLUNA DIREITA ================= */
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.warningCard {
+  background-color: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+
+.warningCard h3 {
+  font-size: 16px;
+  color: #ef4444;
+  margin-bottom: 10px;
+}
+
+.warningCard p {
+  font-size: 15px;
+  color: #ef4444;
+  margin-bottom: 8px;
+}
+
+.warningList {
+  list-style: none;
+  padding-left: 32px;
+}
+
+.warningList li {
+  color: #ef4444;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.produtosCard {
+  background-color: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 18px;
+  padding: 22px 24px 26px;
+}
+
+.produtosHeader {
+  margin-bottom: 18px;
+}
+
+.produtosHeader h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
 }
 
 .tableWrapper {
-    overflow-x: auto;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
 }
 
 thead {
-    background: #f1f5f9;
+  background-color: #ffffff;
 }
 
-th,
+th {
+  text-align: left;
+  padding: 14px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+}
+
 td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #e5e7eb;
-    text-align: left;
-    font-size: 14px;
+  padding: 12px;
+  font-size: 15px;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.produtoNome {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.produtoDescricao {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.linhaAlerta {
+  background-color: #fff5f5;
+}
+
+.valorBaixo {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.statusOk {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.statusBaixo {
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 .semDados {
-    text-align: center;
-    color: #6b7280;
-    padding: 24px;
+  text-align: center;
+  color: #6b7280;
+  padding: 18px;
 }
