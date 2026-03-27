@@ -1,26 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
 import "./styles.css";
 
-export default function FormProduto() {
-  const { id } = useParams();
-
-  const editando = !!id;
-
+export default function NovoProduto() {
   const [nome, setNome] = useState("");
   const [tipo, setTipo] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [preco, setPreco] = useState("");
   const [quantidadeAtual, setQuantidadeAtual] = useState("");
   const [quantidadeMinima, setQuantidadeMinima] = useState("");
   const [mensagem, setMensagem] = useState("");
-
-  useEffect(() => {
-    if (editando) {
-      carregarProduto();
-    }
-  }, [id]);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem("token");
@@ -32,28 +20,11 @@ export default function FormProduto() {
     };
   };
 
-  const carregarProduto = async () => {
-    try {
-      const response = await axios.get(
-        `http://127.0.0.1:8000/api/produtos/${id}/`,
-        getAuthHeaders()
-      );
-
-      const produto = response.data;
-
-      setNome(produto.nome || "");
-      setTipo(produto.tipo || "");
-      setDescricao(produto.descricao || "");
-      setPreco(produto.preco ?? "");
-      setQuantidadeAtual(produto.quantidadeAtual ?? "");
-      setQuantidadeMinima(produto.quantidadeMinima ?? "");
-    } catch (error) {
-      console.log("Erro ao carregar produto:", error);
-      setMensagem("Erro ao carregar produto.");
-    }
+  const voltar = () => {
+    window.location.href = "/cadastro-produto";
   };
 
-  const salvarProduto = async (e) => {
+  const cadastrarProduto = async (e) => {
     e.preventDefault();
     setMensagem("");
 
@@ -61,7 +32,6 @@ export default function FormProduto() {
       !nome ||
       !tipo ||
       !descricao ||
-      preco === "" ||
       quantidadeAtual === "" ||
       quantidadeMinima === ""
     ) {
@@ -69,56 +39,32 @@ export default function FormProduto() {
       return;
     }
 
-    const dadosProduto = {
-      nome,
-      tipo,
-      descricao,
-      preco: Number(preco),
-      quantidadeAtual: Number(quantidadeAtual),
-      quantidadeMinima: Number(quantidadeMinima),
-    };
-
     try {
-      if (editando) {
-        await axios.put(
-          `http://127.0.0.1:8000/api/produtos/${id}/`,
-          dadosProduto,
-          getAuthHeaders()
-        );
+      await axios.post(
+        "http://127.0.0.1:8000/api/produtos/",
+        {
+          nome,
+          tipo,
+          descricao,
+          quantidadeAtual: Number(quantidadeAtual),
+          quantidadeMinima: Number(quantidadeMinima),
+        },
+        getAuthHeaders()
+      );
 
-        setMensagem("Produto atualizado com sucesso.");
-      } else {
-        await axios.post(
-          "http://127.0.0.1:8000/api/produtos/",
-          dadosProduto,
-          getAuthHeaders()
-        );
-
-        setMensagem("Produto cadastrado com sucesso.");
-
-        setNome("");
-        setTipo("");
-        setDescricao("");
-        setPreco("");
-        setQuantidadeAtual("");
-        setQuantidadeMinima("");
-      }
+      setMensagem("Produto cadastrado com sucesso.");
 
       setTimeout(() => {
         window.location.href = "/cadastro-produto";
       }, 1000);
     } catch (error) {
-      console.log("Erro ao salvar produto:", error);
-      setMensagem("Erro ao salvar produto.");
+      console.log("Erro ao cadastrar produto:", error);
+      setMensagem("Erro ao cadastrar produto.");
     }
   };
 
-  const voltar = () => {
-    window.location.href = "/cadastro-produto";
-  };
-
   return (
-    <div className="formProdutoPage">
+    <div className="novoProdutoPage">
       <header className="topBar">
         <div className="topLeft">
           <button className="backButton" onClick={voltar}>
@@ -127,28 +73,19 @@ export default function FormProduto() {
 
           <div className="titleDivider"></div>
 
-          <h1 className="pageTitle">
-            {editando ? "Editar Produto" : "Novo Produto"}
-          </h1>
+          <h1 className="pageTitle">Novo Produto</h1>
         </div>
 
-        <div className="topRight">
-          <div className="userBadge">
-            <span className="userIcon">◉</span>
-            <span>Administrador</span>
-          </div>
-
-          <button className="logoutButton">Sair</button>
-        </div>
+        <button className="logoutButton">Sair</button>
       </header>
 
-      <main className="formProdutoContent">
+      <main className="novoProdutoContent">
         <section className="formCard">
-          <div className="formCardHeader">
-            <h2>{editando ? "Editar Produto" : "Cadastrar Produto"}</h2>
+          <div className="formHeader">
+            <h2>Cadastrar Produto</h2>
           </div>
 
-          <form className="produtoForm" onSubmit={salvarProduto}>
+          <form className="produtoForm" onSubmit={cadastrarProduto}>
             <div className="formGroup">
               <label>Nome *</label>
               <input
@@ -181,17 +118,6 @@ export default function FormProduto() {
 
             <div className="formRow">
               <div className="formGroup">
-                <label>Preço *</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={preco}
-                  onChange={(e) => setPreco(e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div className="formGroup">
                 <label>Estoque Atual *</label>
                 <input
                   type="number"
@@ -215,12 +141,12 @@ export default function FormProduto() {
             {mensagem && <p className="mensagemBox">{mensagem}</p>}
 
             <div className="formActions">
-              <button type="button" className="secondaryButton" onClick={voltar}>
+              <button type="button" className="cancelButton" onClick={voltar}>
                 Cancelar
               </button>
 
-              <button type="submit" className="primaryButton">
-                {editando ? "Salvar Alterações" : "Cadastrar Produto"}
+              <button type="submit" className="saveButton">
+                Cadastrar Produto
               </button>
             </div>
           </form>

@@ -102,14 +102,7 @@ export default function CadastroProduto() {
           <h1 className="pageTitle">Cadastro de Produtos</h1>
         </div>
 
-        <div className="topRight">
-          <div className="userBadge">
-            <span className="userIcon">◉</span>
-            <span>Administrador</span>
-          </div>
-
           <button className="logoutButton">Sair</button>
-        </div>
       </header>
 
       <main className="cadastroContent">
@@ -143,7 +136,6 @@ export default function CadastroProduto() {
                 <tr>
                   <th>Nome</th>
                   <th>Descrição</th>
-                  <th>Preço</th>
                   <th>Estoque Atual</th>
                   <th>Estoque Mínimo</th>
                   <th>Ações</th>

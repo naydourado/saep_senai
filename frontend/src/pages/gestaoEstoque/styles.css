@@ -265,6 +265,7 @@ hr {
 
 .produtosHeader {
   margin-bottom: 18px;
+  border-radius: 10px 10px 0 0
 }
 
 .produtosHeader h2 {
@@ -276,7 +277,7 @@ hr {
 .tableWrapper {
   overflow-x: auto;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
 }
 
 table {
